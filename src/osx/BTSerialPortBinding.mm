@@ -146,7 +146,7 @@ void BTSerialPortBinding::EIO_AfterWrite(uv_work_t *req) {
 }
 
 void BTSerialPortBinding::EIO_Read(uv_work_t *req) {
-    unsigned int buf[4096] = { 0 };
+    unsigned int buf[1024] = { 0 };
 
     read_baton_t *baton = static_cast<read_baton_t *>(req->data);
     size_t size = 0;
@@ -164,7 +164,10 @@ void BTSerialPortBinding::EIO_Read(uv_work_t *req) {
 
     // when no data is read from rfcomm the connection has been closed.
     baton->size = size;
-    memcpy(&baton->result, buf, size);
+    // add check before copying
+    if (size > 0) {
+        memcpy(&baton->result, buf, size);
+    }
 }
 
 void BTSerialPortBinding::EIO_AfterRead(uv_work_t *req) {
